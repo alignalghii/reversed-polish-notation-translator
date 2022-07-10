@@ -12,6 +12,11 @@ Maybe.prototype.map = function (f)
     );
 };
 
+Maybe.prototype.maybe_strict = function (nothingCase, justCase)
+{
+    return this.maybe_eval(() => nothingCase, justCase);
+};
+
 Maybe.prototype.mBind = function (mf)
 {
     return this.maybe_eval(
@@ -19,6 +24,13 @@ Maybe.prototype.mBind = function (mf)
         mf
    );
 };
+
+Maybe.prototype.fromMaybe = function (dflt)
+{
+    return this.maybe_strict(dflt, value => value);
+};
+
+// For testing purposes:
 
 Maybe.prototype.equals = function (otherMaybeValue)
 {

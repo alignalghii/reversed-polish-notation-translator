@@ -3,10 +3,10 @@ import '../types/ArrayExt.mjs';
 
 // Class-wide functions/constants:
 
-function PostfixContext(argumentsExpression, postFixStack)
+function PostfixContext(argumentsExpression, postfixStack)
 {
     this.argumentsExpression = argumentsExpression;
-    this.postFixStack        = postFixStack;
+    this.postfixStack        = postfixStack;
 }
 
 PostfixContext.arithmeticPrecedences = {'+': 1, '-': 1, '*': 2, '/': 2};
@@ -59,13 +59,21 @@ PostfixContext.prototype.flushParenthesizedOperators = function (currentSymbol)
 
 PostfixContext.prototype.bendBack = function ()
 {
-    return this.argumentsExpression.concat(this.postFixStack.reverse());
+    return this.argumentsExpression.concat(this.postfixStack.reverse());
 };
 
 PostfixContext.prototype.moveItemsWhile = function (condition)
 {
-    this.postFixStack.moveItemsToWhile(
+    this.postfixStack.moveItemsToWhile(
         this.argumentsExpression,
         condition
     );
+};
+
+// Equality --- for testing purposes
+
+PostfixContext.prototype.equals = function (otherContext)
+{
+    return this.argumentsExpression.equals(otherContext.argumentsExpression) &&
+           this.postfixStack       .equals(otherContext.postfixStack       ) ;
 };

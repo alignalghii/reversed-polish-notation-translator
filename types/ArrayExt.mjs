@@ -14,13 +14,42 @@ Reflect.defineProperty(
 
 Reflect.defineProperty(
 	Array.prototype,
-	'moveItemsTowhile',
+	'moveItemsToWhile',
 	{
 		value:
 		function (targetArray, condition)
 		{
-		    while (this.maybeGetLastItem().fromMaybe(false, condition))
+		    while (this.maybeGetLastItem().maybe_strict(false, condition))
 		        targetArray.push(this.pop());
+		}
+	}
+);
+
+// For testing purposes:
+
+Reflect.defineProperty(
+	Array.prototype,
+	'equals',
+	{
+		value:
+		function (otherArray)
+		{
+		    let flag = this.length == otherArray.length;
+		    for (let i = 0; flag && i < this.length; i++)
+		        flag = flag && this[i] == otherArray[i];
+		    return flag;
+		}
+	}
+);
+
+Reflect.defineProperty(
+	Array.prototype,
+	'globalConjunction',
+	{
+		value:
+		function ()
+		{
+		    return this.every(flag => flag);
 		}
 	}
 );
