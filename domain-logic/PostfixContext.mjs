@@ -17,10 +17,10 @@ PostfixContext.prototype.processCurrentSymbol = function (currentSymbol)
 {
     const precs = PostfixContext.arithmeticPrecedences;
     switch (true) {
-        case parseFloat(currentSymbol): this.simpleArgument                 (currentSymbol); break;
-        case currentSymbol in precs   : this.flushHigherPrecendenceOperators(currentSymbol); break;
-        case currentSymbol == '('     : this.stackAsPostfixOperator         (currentSymbol); break;
-        case currentSymbol == ')'     : this.flushParenthesizedOperators    (currentSymbol); break;
+        case /[0-9]/.test(currentSymbol): this.simpleArgument                 (currentSymbol); break;
+        case currentSymbol in precs     : this.flushHigherPrecendenceOperators(currentSymbol); break;
+        case currentSymbol == '('       : this.stackAsPostfixOperator         (currentSymbol); break;
+        case currentSymbol == ')'       : this.flushParenthesizedOperators    (currentSymbol); break;
     }
 };
 

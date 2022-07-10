@@ -1,4 +1,4 @@
-export {rawTextToPostfixNotation};
+export {rawTextToPostfixNotation, expressionToPostfixNotation};
 import {PostfixContext} from './PostfixContext.mjs';
 
 const wrapLexerAround =  // Def with currying
@@ -8,7 +8,7 @@ const wrapLexerAround =  // Def with currying
 
 const expressionToPostfixNotation = inputExpression =>
         inputExpression.reduce(
-            context => {context.processCurrentSymbol(currentSymbol); return context;},
+            (context, currentSymbol) => {context.processCurrentSymbol(currentSymbol); return context;},
             new PostfixContext([], [])
         ).bendBack();
 

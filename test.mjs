@@ -1,6 +1,7 @@
 import './types/ArrayExt.mjs';
 import {Maybe} from './types/algebraic-datatype/MaybeExt.mjs';
 import {PostfixContext} from './domain-logic/PostfixContext.mjs';
+import {rawTextToPostfixNotation, expressionToPostfixNotation} from './domain-logic/postfix-notation-translator.mjs';
 
 const testCases = [
     // 'Maybe fromBool tests:',
@@ -37,7 +38,20 @@ const testCases = [
     contextChangeTest([  ], [             ], 'processCurrentSymbol', '4', ['4'     ], [   ]),
     contextChangeTest([  ], ['*', '/'     ], 'processCurrentSymbol', '+', ['/', '*'], ['+']),
     contextChangeTest([  ], [             ], 'processCurrentSymbol', '(', [        ], ['(']),
-    contextChangeTest([  ], ['(', '*', '/'], 'processCurrentSymbol', ')', ['/', '*'], [   ])
+    contextChangeTest([  ], ['(', '*', '/'], 'processCurrentSymbol', ')', ['/', '*'], [   ]),
+
+    // 'Final tests:',
+    expressionToPostfixNotation([             ]).equals([             ]),
+    expressionToPostfixNotation(['1'          ]).equals(['1'          ]),
+    expressionToPostfixNotation(['1', '2'     ]).equals(['1', '2'     ]),
+    expressionToPostfixNotation(['1', '+', '2']).equals(['1', '2', '+']),
+    rawTextToPostfixNotation(''       ) == ''     ,
+    rawTextToPostfixNotation('1'      ) == '1'    ,
+    rawTextToPostfixNotation('12'     ) == '12'   ,
+    rawTextToPostfixNotation('1+2'    ) == '12+'  ,
+    rawTextToPostfixNotation('2*3+1'  ) == '23*1+',
+    rawTextToPostfixNotation('1+2*3'  ) == '123*+',
+    rawTextToPostfixNotation('1*(2+3)') == '123+*'
 ];
 
 console.log(testCases);
