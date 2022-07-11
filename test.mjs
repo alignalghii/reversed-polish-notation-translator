@@ -6,12 +6,6 @@ import {rawTextToPostfixNotation, expressionToPostfixNotation} from './domain-lo
 const testCases = [
     // 'Final integration tests:',
     // ==========================
-    expressionToPostfixNotation([             ]).equals([             ]),
-    expressionToPostfixNotation(['1'          ]).equals(['1'          ]),
-    expressionToPostfixNotation(['1', '2'     ]).equals(['1', '2'     ]),
-    expressionToPostfixNotation(['1', '+', '2']).equals(['1', '2', '+']),
-
-    // Final integration test, but without the lexer (directly on the parsed symbol array)
 
     rawTextToPostfixNotation(''       ) == ''     ,
     rawTextToPostfixNotation('1'      ) == '1'    ,
@@ -20,6 +14,13 @@ const testCases = [
     rawTextToPostfixNotation('2*3+1'  ) == '23*1+',
     rawTextToPostfixNotation('1+2*3'  ) == '123*+',
     rawTextToPostfixNotation('1*(2+3)') == '123+*',
+
+    // Final integration test, but without the lexer (directly on the parsed symbol array)
+
+    expressionToPostfixNotation([             ]).equals([             ]),
+    expressionToPostfixNotation(['1'          ]).equals(['1'          ]),
+    expressionToPostfixNotation(['1', '2'     ]).equals(['1', '2'     ]),
+    expressionToPostfixNotation(['1', '+', '2']).equals(['1', '2', '+']),
 
     // Semi-integration test: testing the PostfixContext class, the workhorse of the whole domain logic:
     // -------------------------------------------------------------------------------------------------
