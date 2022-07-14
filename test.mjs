@@ -26,15 +26,15 @@ const testCases = [
     // -------------------------------------------------------------------------------------------------
 
     // 'PostfixContext main method test:',
-    contextChangeTest([  ], [             ], 'processCurrentSymbol', '4', ['4'     ], [   ]),
-    contextChangeTest([  ], ['*', '/'     ], 'processCurrentSymbol', '+', ['/', '*'], ['+']),
-    contextChangeTest([  ], [             ], 'processCurrentSymbol', '(', [        ], ['(']),
-    contextChangeTest([  ], ['(', '*', '/'], 'processCurrentSymbol', ')', ['/', '*'], [   ]),
+    contextChangeTest([  ], [             ], 'processCurrentSymbol', ['4'], ['4'     ], [   ]),
+    contextChangeTest([  ], ['*', '/'     ], 'processCurrentSymbol', ['+'], ['/', '*'], ['+']),
+    contextChangeTest([  ], [             ], 'processCurrentSymbol', ['('], [        ], ['(']),
+    contextChangeTest([  ], ['(', '*', '/'], 'processCurrentSymbol', [')'], ['/', '*'], [   ]),
     // 'Constituent (case) methods of the PostfixContext main method (testing cases separately):',
-    contextChangeTest([  ], [             ], 'simpleArgument'                 , '4', ['4'     ], [   ]),
-    contextChangeTest([  ], ['*', '/'     ], 'flushHigherPrecendenceOperators', '+', ['/', '*'], ['+']),
-    contextChangeTest([  ], [             ], 'stackAsPostfixOperator'         , '(', [        ], ['(']),
-    contextChangeTest([  ], ['(', '*', '/'], 'flushParenthesizedOperators'    , ')', ['/', '*'], [   ]),
+    contextChangeTest([  ], [             ], 'simpleArgument'                 , ['4'   ], ['4'     ], [   ]),
+    contextChangeTest([  ], ['*', '/'     ], 'flushHigherPrecendenceOperators', ['+', 1], ['/', '*'], ['+']),
+    contextChangeTest([  ], [             ], 'stackAsPostfixOperator'         , ['('   ], [        ], ['(']),
+    contextChangeTest([  ], ['(', '*', '/'], 'flushParenthesizedOperators'    , [      ], ['/', '*'], [   ]),
 
     // Unit testing for the auxiliary modules (algebraic datatypes, other type extensions):
     // ===================================================================================
@@ -71,12 +71,12 @@ console.log(`Result in summary: ${testCases.globalConjunction()}`);
 // See `.globalConjunction` in `types/ArrayExt.mjs`: defined as `.every(flag => flag)`
 
 function contextChangeTest(argumentsExpression_input, postfixStack_input,
-                           methodName, symbol,
+                           methodName, args,
                            argumentsExpression_expectation, postfixStack_expectation)
 {
     const context_input       = new PostfixContext(argumentsExpression_input      , postfixStack_input      );
     const context_expectation = new PostfixContext(argumentsExpression_expectation, postfixStack_expectation);
-    context_input[methodName](symbol);
+    PostfixContext.prototype[methodName].apply(context_input, args);
     return context_input.equals(context_expectation);
 }
 

@@ -17,10 +17,10 @@ PostfixContext.prototype.processCurrentSymbol = function (currentSymbol)
 {
     const precs = PostfixContext.arithmeticPrecedences;
     switch (true) {
-        case /[0-9]/.test(currentSymbol): this.simpleArgument                 (currentSymbol); break;
-        case currentSymbol in precs     : this.flushHigherPrecendenceOperators(currentSymbol); break;
-        case currentSymbol == '('       : this.stackAsPostfixOperator         (currentSymbol); break;
-        case currentSymbol == ')'       : this.flushParenthesizedOperators    (currentSymbol); break;
+        case /[0-9]/.test(currentSymbol): this.simpleArgument                 (currentSymbol                      ); break;
+        case currentSymbol in precs     : this.flushHigherPrecendenceOperators(currentSymbol, precs[currentSymbol]); break;
+        case currentSymbol == '('       : this.stackAsPostfixOperator         (currentSymbol                      ); break;
+        case currentSymbol == ')'       : this.flushParenthesizedOperators    (                                   ); break;
     }
 };
 
@@ -38,16 +38,16 @@ PostfixContext.prototype.stackAsPostfixOperator = function (currentSymbol)
 };
 
 
-PostfixContext.prototype.flushHigherPrecendenceOperators = function (currentSymbol)
+PostfixContext.prototype.flushHigherPrecendenceOperators = function (currentSymbol, currentSymbolPrecedence)
 {
     const precs = PostfixContext.arithmeticPrecedences;
     this.moveItemsWhile(
-        stackItem => stackItem in precs && precs[stackItem] >= precs[currentSymbol]
+        stackItem => stackItem in precs && precs[stackItem] >= currentSymbolPrecedence
     );
     this.stackAsPostfixOperator(currentSymbol);
 };
 
-PostfixContext.prototype.flushParenthesizedOperators = function (currentSymbol)
+PostfixContext.prototype.flushParenthesizedOperators = function ()
 {
             this.moveItemsWhile(
                 stackItem => stackItem != '('
