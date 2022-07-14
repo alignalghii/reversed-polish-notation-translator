@@ -1,13 +1,16 @@
 module Translator where
 
 import PostfixContext hiding (spec)
+-- For testing:
+import CommonAbstractSyntaxTree
 import Test.Hspec
+import Test.QuickCheck
 
 translate :: String -> String
 translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
 
-spec :: Spec
-spec = describe "PostfixContext main function: processCurrentSymbol" $ do
+translateSpec :: Spec
+translateSpec = describe "PostfixContext main function: processCurrentSymbol" $ do
     it "processes digit symbols like simpleArgument" $ do
         translate ""        `shouldBe` ""
         translate "1"       `shouldBe` "1"
@@ -20,3 +23,6 @@ spec = describe "PostfixContext main function: processCurrentSymbol" $ do
         translate "2*3+1"   `shouldBe` "23*1+"
         translate "1+2*3"   `shouldBe` "123*+"
         translate "1*(2+3)" `shouldBe` "123+*"
+
+prop_translate :: SimpleArithmetic -> Bool
+prop_translate abstractSyntaxTree = translate (showAsInfix abstractSyntaxTree) == showAsPostfix abstractSyntaxTree
