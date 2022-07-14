@@ -1,6 +1,22 @@
 module Translator where
 
-import PostfixContext
+import PostfixContext hiding (spec)
+import Test.Hspec
 
 translate :: String -> String
-translate = bendBack . foldr processCurrentSymbol initialPostfixContext
+translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
+
+spec :: Spec
+spec = describe "PostfixContext main function: processCurrentSymbol" $ do
+    it "processes digit symbols like simpleArgument" $ do
+        translate ""        `shouldBe` ""
+        translate "1"       `shouldBe` "1"
+        translate "12"      `shouldBe` "12"
+        translate "123"     `shouldBe` "123"
+    it "processes a simple infix construct like postfix" $ do
+        translate "1+2"     `shouldBe` "12+"
+        translate "2*3"     `shouldBe` "23*"
+    it "handles precedences and parantheses well" $ do
+        translate "2*3+1"   `shouldBe` "23*1+"
+        translate "1+2*3"   `shouldBe` "123*+"
+        translate "1*(2+3)" `shouldBe` "123+*"
