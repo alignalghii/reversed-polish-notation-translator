@@ -4,7 +4,7 @@ The task is to write a simple program, which converts basic arithmetic formulas 
 
 For simplicity's sake, the numbers can be simple integers between 0 and 9 (i.e. 1-digit numbers).
 
-Examples for this translation specification can be found in the [`test.mjs`](test.mjs) file:
+Examples for this translation specification can be found in the [`main-test.mjs`](nodejs/main-test.mjs) file:
 
 ```javascript
 rawTextToPostfixNotation(''       ) == ''     ,
@@ -19,7 +19,7 @@ rawTextToPostfixNotation('1*(2+3)') == '123+*',
 We can see from the last example, that the reverse Polish notation can evade the usage of parentheses.
 This suggests that the solution is based on some kind of stack/FIFO structures. Indeed, for implementation, we will use an auxiliary stack.
 
-First, let us see a general scheme of he solution: it can be found in the [`domain-logic/postfix-notation-translator.mjs`](domain-logic/postfix-notation-translator.mjs) file:
+First, let us see a general scheme of he solution: it can be found in the [`domain-logic/postfix-notation-translator.mjs`](nodejs/domain-logic/postfix-notation-translator.mjs) file:
 
 ```javascript
 const expressionToPostfixNotation = inputExpression =>
@@ -55,7 +55,7 @@ const expressionToPostfixNotation = inputExpression =>
 const rawTextToPostfixNotation = wrapLexerAround(expressionToPostfixNotation); // Currying used
 ```
 
-as we can see in the definitions defined in the [`domain-logic/postfix-notation-translator.mjs`](domain-logic/postfix-notation-translator.mjs) file.
+as we can see in the definitions defined in the [`domain-logic/postfix-notation-translator.mjs`](nodejs/domain-logic/postfix-notation-translator.mjs) file.
 
 ## A purely functional, declarative shell around imperative details
 
@@ -80,7 +80,7 @@ expressionToPostfixNotation(['1', '2'     ]).equals(['1', '2'     ]),
 expressionToPostfixNotation(['1', '+', '2']).equals(['1', '2', '+']),
 ```
 
-The details behind this simple foldr/reduce-style solution can be found in [`domain-logic/PostfixContext.mjs`](domain-logic/PostfixContext.mjs):
+The details behind this simple foldr/reduce-style solution can be found in [`domain-logic/PostfixContext.mjs`](nodejs/domain-logic/PostfixContext.mjs):
 
 ```javascript
 function PostfixContext(argumentsExpression, postfixStack)
@@ -109,11 +109,10 @@ The further details, i.e. the delegate case methods of the main method of this f
 
 Some auxiliary datatypes are also used. they can be found in:
 
-- [`types/ArrayExt.mjs`](types/ArrayExt.mjs)
-- and in submdule-folder [`types/algebraic-datatype`](types/algebraic-datatype), which contains a Scala-inspired style implementation (with case object) of the Option type, thus, evading the null-value problems:
-    - [`types/algebraic-datatype/MaybeExt.mjs`](types/algebraic-datatype/MaybeExt.mjs)
-    - [`types/algebraic-datatype/Maybe.mjs`](types/algebraic-datatype/Maybe.mjs)
-    - [`types/algebraic-datatype/Maybe_Just.mjs`](types/algebraic-datatype/Maybe_Just.mjs)
-    - [`types/algebraic-datatype/Maybe_Nothing.mjs`](types/algebraic-datatype/Maybe_Nothing.mjs)
+- [`algebraic-datatypes/ArrayExt.mjs`](nodejs/algebraic-datatypes/ArrayExt.mjs)
+- [`algebraic-datatypes/MaybeExt.mjs`](nodejs/algebraic-datatypes/MaybeExt.mjs), which contains a Scala-inspired style implementation of the famous `Option` type (in Haskell: `Maybe`), the functional programming solution for evading the null-value problems (making partial functions total). The Scala-inspired implementation details (“*case objects*”) are contained in a subfolder of its own:
+    - [`algebraic-datatypes/MaybeExt/Maybe.mjs`](nodejs/algebraic-datatypes/MaybeExt/Maybe.mjs), an abstract class
+    - [`algebraic-datatypes/MaybeExt/Maybe_Just.mjs`](nodejs/algebraic-datatypes/MaybeExt/Maybe_Just.mjs), a child class concretization for the existing value case
+    - [`algebraic-datatypes/MaybeExt/Maybe_Nothing.mjs`](nodejs/algebraic-datatypes/MaybeExt/Maybe_Nothing.mjs), a child class concretization for the missing value case
 
-This is the standard solution of implementing an [algebraic datatype]() in an imperative language, using OOP inheritance to simulate that. The trick's main idea was first used in Self and Smalltalkt to implement Bool, and later generalized in Scala for arbitrary algebraic datatypes: an arbitrary structure composed of algebraic direct products and direct sums (sort of records and tagged unions).
+This is the standard solution of implementing an [algebraic datatype](https://en.wikipedia.org/wiki/Algebraic_data_type) in an imperative language, using OOP inheritance to simulate that. The trick's main idea was first used in Self and Smalltalkt to implement Bool, and later generalized in Scala for arbitrary algebraic datatypes: an arbitrary structure composed of algebraic direct products and direct sums (sort of records and tagged unions).
