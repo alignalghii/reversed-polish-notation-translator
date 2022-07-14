@@ -1,8 +1,8 @@
 export {Maybe};
 
-import {Maybe}         from './Maybe.mjs';
-import {Maybe_Nothing} from './Maybe_Nothing.mjs';
-import {Maybe_Just}    from './Maybe_Just.mjs';
+import {Maybe}         from './MaybeExt/Maybe.mjs';
+import {Maybe_Nothing} from './MaybeExt/Maybe_Nothing.mjs';
+import {Maybe_Just}    from './MaybeExt/Maybe_Just.mjs';
 
 
 // Factory methods (or constructor aliases):

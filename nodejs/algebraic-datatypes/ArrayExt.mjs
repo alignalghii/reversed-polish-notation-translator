@@ -1,4 +1,4 @@
-import {Maybe} from './algebraic-datatype/MaybeExt.mjs';
+import {Maybe} from './MaybeExt.mjs';
 
 Reflect.defineProperty(
 	Array.prototype,

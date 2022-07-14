@@ -1,5 +1,5 @@
 export {PostfixContext};
-import '../types/ArrayExt.mjs';
+import '../algebraic-datatypes/ArrayExt.mjs';
 
 // Class-wide functions/constants:
 

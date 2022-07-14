@@ -1,5 +1,5 @@
-import './types/ArrayExt.mjs';
-import {Maybe} from './types/algebraic-datatype/MaybeExt.mjs';
+import './algebraic-datatypes/ArrayExt.mjs';
+import {Maybe} from './algebraic-datatypes/MaybeExt.mjs';
 import {PostfixContext} from './domain-logic/PostfixContext.mjs';
 import {rawTextToPostfixNotation, expressionToPostfixNotation} from './domain-logic/postfix-notation-translator.mjs';
 
