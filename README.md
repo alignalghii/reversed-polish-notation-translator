@@ -21,6 +21,8 @@ Hspec contains examples for this translation specification, it can be found in t
 
 As for the other testing tool, QuickCheck is a good additional motivation to use Haskell: property testing is a very strong tool, because random generation provides hundreds of samples for free. And also because it motivates the programmer towards grasping core properties on a higher level. Here, a kind of V-shape pattern for property testing is used.
 
+![V-testing](V-testing.svg "V-shape pattern for property testing")
+
 ## The Node.js version
 
 The same idea can be expressed also in the JavaScript (nodejs) version, although we will keep some parts imperative, due to the different optimization strategies of the two compilers/interpreters.
@@ -136,4 +138,10 @@ Some auxiliary datatypes are also used. they can be found in:
     - [`algebraic-datatypes/MaybeExt/Maybe_Just.mjs`](nodejs/algebraic-datatypes/MaybeExt/Maybe_Just.mjs), a child class concretization for the existing value case
     - [`algebraic-datatypes/MaybeExt/Maybe_Nothing.mjs`](nodejs/algebraic-datatypes/MaybeExt/Maybe_Nothing.mjs), a child class concretization for the missing value case
 
-This is the standard solution of implementing an [algebraic datatype](https://en.wikipedia.org/wiki/Algebraic_data_type) in an imperative language, using OOP inheritance to simulate that. The trick's main idea was first used in Self and Smalltalkt to implement Bool, and later generalized in Scala for arbitrary algebraic datatypes: an arbitrary structure composed of algebraic direct products and direct sums (sort of records and tagged unions).
+This is the standard solution of implementing an [algebraic datatype](https://en.wikipedia.org/wiki/Algebraic_data_type) in an imperative language, using OOP inheritance to simulate that.
+
+![Maybe-UML](Maybe-UML.svg "Case object implementation of the Maybe algebraic datatype")
+
+The trick's main idea was first used in Self and Smalltalkt to implement Bool, and later generalized in Scala for arbitrary algebraic datatypes: an arbitrary structure composed of algebraic direct products and direct sums (sort of records and tagged unions).
+
+![Bool-UML](Bool-UML.svg "Case object implementation of the Bool type in Smalltalk and Self")
