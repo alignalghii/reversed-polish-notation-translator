@@ -1,27 +1,96 @@
 # Using patterns from functional programming for refactoring traditional codebases
 
-The task is to write a simple program, which converts basic arithmetic formulas (familiar infix notation) into the reversed Polish notation (posfix notation, well known to i.e. Forth programmers).
+The task is to write a simple program, which converts basic arithmetic formulas (of the familiar infix notation) into the reversed Polish notation (postfix notation, well known to i.e. Forth programmers, experts of PostScripts, rememberers of Hewlett-Packard calculators).
 
-For simplicity's sake, the numbers can be simple integers between 0 and 9 (i.e. 1-digit numbers).
+For simplicity's sake, let the numbers be simple integers between 0 and 9 (i.e. 1-digit numbers).
 
-The sorcecode of the task can be regarded as an obfuscated version of a solution using two stacks (LIFOs). Furthermore, the obfuscated iplementation seems to be having its core originally written in a declarative, functional programming style, mixed with imperative usage of closures.
+The sorcecode of the task can be regarded as an obfuscated version of an algorithm based on using two stacks (LIFOs). Furthermore, the obfuscated implementation seems to be having its core originally written in a declarative, functional programming style, mixed with imperative usage of closures.
 
-Thus, the task is essentially finding this pure core behind the obfuscation. This can be done by using standard refactory steps (factoring out into independent function, establishing standalone algebraic types etc.)
+Thus, the task is essentially finding this pure core behind the obfuscation. This can be done by using standard refactory steps (factoring out into independent function, establishing standalone algebraic types etc.).
 
-This page will take a round trip. Firt we will show first a pure functional solution, written in Haskell. Besides undoing the obfuscation by refactory, also the imperative parts of the code will be rewritten by purely declaritive counterparts, mostly by finding paaropriate algebraic data types for the problem space.
+This page will take a round trip. Firt we will show first a pure functional solution, written in Haskell. Besides undoing the obfuscation by refactory, also the imperative parts of the code will be rewritten by their purely declaritive counterparts, mostly by finding apropriate algebraic data types for the problem space. We can represent the idiomatic part of the algorithm into a “two-stack-interaction” data structure (called “`PostfixContext`” in the following sourcecode samples).
 
-After that, returning back to JavaScript, a Node.js implemementation will be shown. Imperative features will be allowed here in a more relaxed, less orthodox manner, especially imperative technique can be justified by the pecularities of the inherent features of the language itself. Thus, it will not be a direct mirror of the Haskell code, but still, we will try to keep the spirit of lazy coupling.
+After having shown the pure Haskell solution, returning back to JavaScript, a Node.js implemementation will be shown. Imperative technique will be allowed here in a more relaxed, less orthodox manner, especially those that can be justified by the pecularities of the inherent features of the language itself (allowing in-place array modification instead of immutable structures). Thus, it will not be a direct mirror of the Haskell code, but still, we will try to keep the spirit of modularity, code reuse, lazy coupling.
 
 ## The Haskell version
 
 The Haskell implementation can be rather compact, while maintaining also modularity, reuse and lazy coupling.
 The sourcecode is accompanied also by Hspec and QuickCheck test cases.
 
-Hspec contains examples for this translation specification, it can be found in the [...](...) file:
+Let us begin with the Hspec test scenario: it contains a kind of specification of the task itself. It can be found in the [`Translator.hs`](haskell+quickcheck/Translator.hs) file:
 
-As for the other testing tool, QuickCheck is a good additional motivation to use Haskell: property testing is a very strong tool, because random generation provides hundreds of samples for free. And also because it motivates the programmer towards grasping core properties on a higher level. Here, a kind of V-shape pattern for property testing is used.
+```haskell
+
+translateSpec = describe "The main function of the task: translate" $ do
+    it "keeps simple digit symbols like simpleArgument" $ do
+        translate ""        `shouldBe` ""
+        translate "1"       `shouldBe` "1"
+        translate "12"      `shouldBe` "12"
+        translate "123"     `shouldBe` "123"
+    it "processes a simple infix construct like postfix" $ do
+        translate "1+2"     `shouldBe` "12+"
+        translate "2*3"     `shouldBe` "23*"
+    it "handles precedences and parantheses well" $ do
+        translate "2*3+1"   `shouldBe` "23*1+"
+        translate "1+2*3"   `shouldBe` "123*+"
+        translate "1*(2+3)" `shouldBe` "123+*
+```
+
+As for the other testing tool, QuickCheck is a good additional motivation to use Haskell: property testing is a very strong tool, because random generation provides hundreds of samples for free. And also because it motivates the programmer towards grasping core properties on a higher level. Here, a kind of V-shape pattern for property testing is used:
+
+```haskell
+prop_translate :: SimpleArithmetic -> Bool
+prop_translate abstractSyntaxTree = translate (showAsInfix abstractSyntaxTree) == showAsPostfix abstractSyntaxTree
+```
+
+By V-shaped pattern of testing, I mean that we can find a “common” representation “above”/“above” the infix notation and postfix notation: the *abstract syntax tree*. It can be regarded as a “notation-agnostic”, “common” representation:
+
+```haskell
+data Digit = Dgt Int
+
+data SimpleArithmetic = Simple Digit
+                      | Add       SimpleArithmetic SimpleArithmetic
+                      | Substract SimpleArithmetic SimpleArithmetic
+                      | Multiply  SimpleArithmetic SimpleArithmetic
+                      | Divide    SimpleArithmetic SimpleArithmetic
+```
+
+See it in [`CommonAbstractSyntaxTree.hs`](haskell+quickcheck/CommonAbstractSyntaxTree.hs) file.
+This is indeed a common, notation-agnostic representation: turning it into postfix form is that easy:
+
+```haskell
+showsAsPostfix :: SimpleArithmetic -> ShowS
+showsAsPostfix (Simple d     ) = showsDigit d
+showsAsPostfix (Add       a b) = showsAsPostfix a . showsAsPostfix b . (:) '+'
+showsAsPostfix (Substract a b) = showsAsPostfix a . showsAsPostfix b . (:) '-'
+showsAsPostfix (Multiply  a b) = showsAsPostfix a . showsAsPostfix b . (:) '*'
+showsAsPostfix (Divide    a b) = showsAsPostfix a . showsAsPostfix b . (:) '/'
+```
+Turning it into the familiary infix form is harder due to additional notational rules like precendence rules and parantheses, but it is not extremely difficult either, see `showsAsInfix` in the same file.
+
+To put the pieces together:
+
+ - simply generate random syntxt trees, a lot by hundreds,
+ - and represent it both in infix and in postfix form.
+ - Use the infix form as an input of the `translate` function
+ - and check whether the result is the same as the postix form.
 
 ![V-testing](V-testing.svg "V-shape pattern for property testing")
+
+QuickCheck is thus a very strong tool for testig, by making the random generation of instances of any custom datatype easily automatizable:
+
+```haskell
+instance Arbitrary Digit where
+    arbitrary = Dgt <$> elements [0..9]
+
+instance Arbitrary SimpleArithmetic where
+    arbitrary = sized genSizedArithmetic
+
+genSizedArithmetic :: Int -> Gen SimpleArithmetic
+genSizedArithmetic 0 = Simple <$> arbitrary
+genSizedArithmetic n = oneof [genSizedArithmetic 0, Add <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Substract <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Multiply <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Divide <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n]
+genSubsizedArithmetic = genSizedArithmetic . (`div` 2)
+```
 
 ## The Node.js version
 
