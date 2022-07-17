@@ -10,8 +10,8 @@ translate :: String -> String
 translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
 
 translateSpec :: Spec
-translateSpec = describe "PostfixContext main function: processCurrentSymbol" $ do
-    it "processes digit symbols like simpleArgument" $ do
+translateSpec = describe "The main function of the task: translate" $ do
+    it "keeps a digit symbol like simpleArgument" $ do
         translate ""        `shouldBe` ""
         translate "1"       `shouldBe` "1"
         translate "12"      `shouldBe` "12"
