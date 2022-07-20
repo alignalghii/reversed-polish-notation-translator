@@ -43,6 +43,8 @@ Although intuitively this seems to be a sufficient coverage for the specificatio
 Here, QuickCheck will be used for this property testing tool, but the more important question is how we can grasp the task and generalize in into algebraic properties. It can be done indeed: let us discover a kind of $\vec V$-shape pattern:
 
 ```haskell
+import Test.QuickCheck
+
 prop_translate :: SimpleArithmetic -> Bool
 prop_translate abstractSyntaxTree = translate (showAsInfix abstractSyntaxTree) == showAsPostfix abstractSyntaxTree
 ```
@@ -74,9 +76,9 @@ Turning it into the familiary infix form is harder due to additional notational 
 
 To put the pieces together:
 
- - simply generate random syntax trees of arithemtic expession, a lot by hundreds (“the bottom point of the $\vec V$”),
+ - simply generate random syntax trees of arithmetic expession, a lot by hundreds (“the bottom point of the $\vec V$”),
  - and turn it into representations, both in infix and in postfix form (“the two legs/wings/branches of the $\vec V$”).
- - Use the infix form as an input of the `translate` function (“the over-arrow symbol above the $\vec V$)
+ - Use the infix form as an input of the `translate` function (“the over-arrow symbol above the $\vec V$”)
  - and check whether the result is the same as the postix form.
 
 ![V-testing](V-testing-scale50.svg "V-shape pattern for property testing")
@@ -84,6 +86,8 @@ To put the pieces together:
 QuickCheck is thus a very strong tool for testig, by making the random generation of instances of any custom datatype easily automatizable:
 
 ```haskell
+import Test.QuickCheck
+
 instance Arbitrary Digit where
     arbitrary = Dgt <$> elements [0..9]
 
@@ -95,6 +99,41 @@ genSizedArithmetic 0 = Simple <$> arbitrary
 genSizedArithmetic n = oneof [genSizedArithmetic 0, Add <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Substract <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Multiply <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Divide <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n]
 genSubsizedArithmetic = genSizedArithmetic . (`div` 2)
 ```
+
+After having seen the specification of the task by the tests, let us see the solution, the implemented algorithm itself!
+
+The highest-level part of the solution can be seen in [`Translator.hs`](haskell+quickcheck/Translator.hs) file:
+
+```haskell
+translate :: String -> String
+translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
+```
+
+Thus, we have kept the main scheme of the original code obfuscation: the “*array-fold/reduce*” construct. But we have cleaned it up: we “factored out” the imperative closures than hang around this main core like rags, and integrated this imperative parts into the traversed structure itself: we augmented the traversed array into a contexted algebraic structure consisting of two stacks.
+
+This is exactly what the [`PostfixContext.hs`](haskell+quickcheck/PostfixContext.hs) file is about:
+
+```haskell
+type PostfixContext = (String, String) -- argumentsExpression, postfixStack
+
+precedences :: [(Char, Int)]
+precedences = [('+', 1), ('-', 1), ('*', 2), ('/', 2)]
+
+processCurrentSymbol :: Char -> PostfixContext -> PostfixContext
+processCurrentSymbol currentSymbol context
+    | isDigit currentSymbol               = simpleArgument              currentSymbol context
+    | currentSymbol == '('                = stackAsPostfixOperator      currentSymbol context
+    | currentSymbol == ')'                = flushParenthesizedOperators               context
+    | otherwise                           = case currentSymbol `lookup` precedences of
+                                                Just precVal -> flushHigherPrecedenceOperators currentSymbol precVal context
+                                                Nothing      -> error $ "Invalid character " ++ [currentSymbol]
+```
+
+This fits indeed into the array reduce/fold main scheme of the task.
+as we can see, this reducer algorithm itself consists of case analysis, and delgates its task onto smaller case delegate functions. The details can be read further below in the `PostFixContext` module file.
+
+Why we have dissected even this main reducer function into stadalone cases and a separate delegate case function for each case?
+Better unit testability, and maybe also a prospect for future generalization and potential discovery interesting or deeper algebraic properties.
 
 ## The Node.js version
 
