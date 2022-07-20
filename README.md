@@ -40,14 +40,14 @@ translateSpec = describe "The main function of the task: translate" $ do
 
 Although intuitively this seems to be a sufficient coverage for the specification of the problem, the so-called *property testing* often provides more thorough testing, because random generation provides hundreds of samples for free. Of course, that comes for a price, but this is infact rather an advantage rather than a disadvantage: property testing motivates the programmer towards grasping core properties on a higher level, and a good unserstanding of the very algebra of the problem.
 
-Here, QuickCheck will be used for this property testing tool, but the more important question is how we can grasp the task and generalize in into algebraic properties. It can be done indeed: let us discover a kind og V-shape pattern:
+Here, QuickCheck will be used for this property testing tool, but the more important question is how we can grasp the task and generalize in into algebraic properties. It can be done indeed: let us discover a kind of $\vec V$-shape pattern:
 
 ```haskell
 prop_translate :: SimpleArithmetic -> Bool
 prop_translate abstractSyntaxTree = translate (showAsInfix abstractSyntaxTree) == showAsPostfix abstractSyntaxTree
 ```
 
-By V-shaped pattern of testing, I mean that we can find a “common” representation “above”/“above” the infix notation and postfix notation: the *abstract syntax tree*. It can be regarded as a “notation-agnostic”, “common” representation:
+By $\vec V$-shaped pattern of testing, I mean that we can find a “common” representation “above”/“above” the infix notation and postfix notation: the *abstract syntax tree*. It can be regarded as a “notation-agnostic”, “common” representation:
 
 ```haskell
 data Digit = Dgt Int
@@ -74,9 +74,9 @@ Turning it into the familiary infix form is harder due to additional notational 
 
 To put the pieces together:
 
- - simply generate random syntax trees of arithemtic expession, a lot by hundreds (the “bottom edge of the V”),
- - and turn it into representations, both in infix and in postfix form (“the two legs/wings/branches of the V”).
- - Use the infix form as an input of the `translate` function (it could be visualize a kind of over-arrow above a V: $\vec V$)
+ - simply generate random syntax trees of arithemtic expession, a lot by hundreds (“the bottom point of the $\vec V$”),
+ - and turn it into representations, both in infix and in postfix form (“the two legs/wings/branches of the $\vec V$”).
+ - Use the infix form as an input of the `translate` function (“the over-arrow symbol above the $\vec V$)
  - and check whether the result is the same as the postix form.
 
 ![V-testing](V-testing-scale50.svg "V-shape pattern for property testing")
