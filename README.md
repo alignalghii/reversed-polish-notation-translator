@@ -75,7 +75,7 @@ To put the pieces together:
  - Use the infix form as an input of the `translate` function
  - and check whether the result is the same as the postix form.
 
-![V-testing](V-testing.svg "V-shape pattern for property testing")
+![V-testing](V-testing-scale50.svg "V-shape pattern for property testing")
 
 QuickCheck is thus a very strong tool for testig, by making the random generation of instances of any custom datatype easily automatizable:
 
@@ -209,8 +209,8 @@ Some auxiliary datatypes are also used. they can be found in:
 
 This is the standard solution of implementing an [algebraic datatype](https://en.wikipedia.org/wiki/Algebraic_data_type) in an imperative language, using OOP inheritance to simulate that.
 
-![Maybe-UML](Maybe-UML.svg "Case object implementation of the Maybe algebraic datatype")
+![Maybe-UML](Maybe-UML-scale50.svg "Case object implementation of the Maybe algebraic datatype")
 
 The trick's main idea was first used in Self and Smalltalkt to implement Bool, and later generalized in Scala for arbitrary algebraic datatypes: an arbitrary structure composed of algebraic direct products and direct sums (sort of records and tagged unions).
 
-![Bool-UML](Bool-UML.svg "Case object implementation of the Bool type in Smalltalk and Self")
+![Bool-UML](Bool-UML-scale50.svg "Case object implementation of the Bool type in Smalltalk and Self")
