@@ -8,9 +8,9 @@ The sorcecode of the task can be regarded as an obfuscated version of an algorit
 
 Thus, the task is essentially finding this pure core behind the obfuscation. This can be done by using standard refactory steps (factoring out into independent function, establishing standalone algebraic types etc.).
 
-This page will take a round trip. Firt we will show first a pure functional solution, written in Haskell. Besides undoing the obfuscation by refactory, also the imperative parts of the code will be rewritten by their purely declaritive counterparts, mostly by finding apropriate algebraic data types for the problem space. We can represent the idiomatic part of the algorithm into a “two-stack-interaction” data structure (called “`PostfixContext`” in the following sourcecode samples).
+This page will take a round trip. First we will show first a pure functional solution, written in Haskell. Besides undoing the obfuscation by refactory, also the imperative parts of the code will be rewritten by their purely declaritive counterparts, mostly by finding apropriate algebraic data types for the problem space. We can represent the idiomatic part of the algorithm into a “two-stack-interaction” data structure (called “`PostfixContext`” in the following sourcecode samples).
 
-After having shown the pure Haskell solution, returning back to JavaScript, a Node.js implemementation will be shown. Imperative technique will be allowed here in a more relaxed, less orthodox manner, especially those that can be justified by the pecularities of the inherent features of the language itself (allowing in-place array modification instead of immutable structures). Thus, it will not be a direct mirror of the Haskell code, but still, we will try to keep the spirit of modularity, code reuse, lazy coupling.
+After having shown the pure Haskell solution, we will return back to JavaScript: a Node.js implemementation will be shown. Imperative technique will be allowed here in a more relaxed, less orthodox manner, especially those that can be justified by the pecularities of the inherent features of the JavaScipt language itself (allowing in-place array modification instead of immutable structures). Thus, it will not be a direct mirror of the Haskell version, but still, we will try to keep the spirit of modularity, code reuse, lazy coupling of the pure solution.
 
 ## The Haskell version
 
@@ -20,7 +20,9 @@ The sourcecode is accompanied also by Hspec and QuickCheck test cases.
 Let us begin with the Hspec test scenario: it contains a kind of specification of the task itself. It can be found in the [`Translator.hs`](haskell+quickcheck/Translator.hs) file:
 
 ```haskell
+import Test.Hspec
 
+translateSpec :: Spec
 translateSpec = describe "The main function of the task: translate" $ do
     it "keeps simple digit symbols like simpleArgument" $ do
         translate ""        `shouldBe` ""
@@ -36,7 +38,9 @@ translateSpec = describe "The main function of the task: translate" $ do
         translate "1*(2+3)" `shouldBe` "123+*
 ```
 
-As for the other testing tool, QuickCheck is a good additional motivation to use Haskell: property testing is a very strong tool, because random generation provides hundreds of samples for free. And also because it motivates the programmer towards grasping core properties on a higher level. Here, a kind of V-shape pattern for property testing is used:
+Although intuitively this seems to be a sufficient coverage for the specification of the problem, the so-called *property testing* often provides more thorough testing, because random generation provides hundreds of samples for free. Of course, that comes for a price, but this is infact rather an advantage rather than a disadvantage: property testing motivates the programmer towards grasping core properties on a higher level, and a good unserstanding of the very algebra of the problem.
+
+Here, QuickCheck will be used for this property testing tool, but the more important question is how we can grasp the task and generalize in into algebraic properties. It can be done indeed: let us discover a kind og V-shape pattern:
 
 ```haskell
 prop_translate :: SimpleArithmetic -> Bool
@@ -70,9 +74,9 @@ Turning it into the familiary infix form is harder due to additional notational 
 
 To put the pieces together:
 
- - simply generate random syntxt trees, a lot by hundreds,
- - and represent it both in infix and in postfix form.
- - Use the infix form as an input of the `translate` function
+ - simply generate random syntax trees of arithemtic expession, a lot by hundreds (the “bottom edge of the V”),
+ - and turn it into representations, both in infix and in postfix form (“the two legs/wings/branches of the V”).
+ - Use the infix form as an input of the `translate` function (it could be visualize a kind of over-arrow above a V: $\vec V$)
  - and check whether the result is the same as the postix form.
 
 ![V-testing](V-testing-scale50.svg "V-shape pattern for property testing")
