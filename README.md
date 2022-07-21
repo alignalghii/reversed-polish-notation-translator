@@ -9,8 +9,10 @@
 
 - [Introduction](#introduction)
 - [The Haskell version](#the-haskell-version)
+    - [Specification with test libs Hspec and QuickCheck](#specification-with-test-libs-hspec-and-quickcheck)
+    - [Purely declarative implementation](#purely-declarative-implementation)
 - [The Node.js version](#the-nodejs-version)
-- [A purely functional, declarative shell around imperative details](#a-purely-functional-declarative-shell-around-imperative-details)
+    - [A purely functional, declarative shell around imperative details](#a-purely-functional-declarative-shell-around-imperative-details)
 
 ## Introduction
 
@@ -30,6 +32,8 @@ After having shown the pure Haskell solution, we will return back to JavaScript:
 
 The Haskell implementation can be rather compact, while maintaining also modularity, reuse and lazy coupling.
 The sourcecode is accompanied also by Hspec and QuickCheck test cases.
+
+### Specification with test libs Hspec and QuickCheck
 
 Let us begin with the Hspec test scenario: it contains a kind of specification of the task itself. It can be found in the [`Translator.hs`](haskell+quickcheck/Translator.hs) file:
 
@@ -113,6 +117,13 @@ genSizedArithmetic 0 = Simple <$> arbitrary
 genSizedArithmetic n = oneof [genSizedArithmetic 0, Add <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Substract <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Multiply <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Divide <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n]
 genSubsizedArithmetic = genSizedArithmetic . (`div` 2)
 ```
+
+---
+[[To the top of this README]](#readme) •|||• [[To project source]](#top)
+
+---
+
+### Purely declarative implementation
 
 After having seen the specification of the task by the tests, let us see the solution, the implemented algorithm itself!
 
@@ -216,7 +227,7 @@ as we can see in the definitions defined in the [`domain-logic/postfix-notation-
 
 ---
 
-## A purely functional, declarative shell around imperative details
+### A purely functional, declarative shell around imperative details
 
 Our solution till now can be seen like refactoring into an almost purely Haskell-spirited decarative paradigm. we could have written almost the same functions in Haskell with lists and the `foldr` catamorphism of the lists, the exact incarnation of array reduce:
 
