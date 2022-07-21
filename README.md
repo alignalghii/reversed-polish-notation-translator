@@ -1,5 +1,14 @@
 # Using patterns from functional programming for refactoring traditional codebases
 
+## Table of contents
+
+- [Introduction](#introduction)
+- [The Haskell version](#the-haskell-version)
+- [The Node.js version](#the-nodejs-version)
+- [A purely functional, declarative shell around imperative details](#a-purely-functional-declarative-shell-around-imperative-details)
+
+## Introduction
+
 The task is to write a simple program, which converts basic arithmetic formulas (of the familiar infix notation) into the reversed Polish notation (postfix notation, well known to i.e. Forth programmers, experts of PostScripts, rememberers of Hewlett-Packard calculators).
 
 For simplicity's sake, let the numbers be simple integers between 0 and 9 (i.e. 1-digit numbers).
