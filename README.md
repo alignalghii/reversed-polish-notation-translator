@@ -183,7 +183,7 @@ rawTextToPostfixNotation('1*(2+3)') == '123+*',
 ```
 
 We can see from the last example, that the reverse Polish notation can evade the usage of parentheses.
-This suggests that the solution is based on some kind of stack/FIFO structures. Indeed, for implementation, we will use an auxiliary stack.
+This suggests that the solution is based on some kind of stack/FIFO structures. Indeed, for implementation, we will use two stacks, a main stack and an auxiliary stack, and itmes will be transfered from one stack onto the other, governed by the symbol just being processed. In short: we keep the main idea of the Haskell solution.
 
 First, let us see a general scheme of he solution: it can be found in the [`domain-logic/postfix-notation-translator.mjs`](nodejs/domain-logic/postfix-notation-translator.mjs) file:
 
@@ -204,7 +204,7 @@ expressionToPostfixNotation(['1', '2'     ]).equals(['1', '2'     ]),
 expressionToPostfixNotation(['1', '+', '2']).equals(['1', '2', '+']),
 ```
 
-If almost the same, as the earlier mentioned final solution, i.e. the `rawTextToPostfixNotation` function: we simply we wrap a lexer around `expressionToPostfixNotation`, and we get exactly the final `rawTextToPostfixNotation`. Wrapping a lexer around is easy with higher-order function and currying:
+If almost the same, as the earlier mentioned final solution, i.e. the `rawTextToPostfixNotation` function: we simply wrap a *lexer* around `expressionToPostfixNotation`, and we get exactly the final `rawTextToPostfixNotation`. Wrapping a lexer around is easy with higher-order function and currying:
 
 ```javascript
 const wrapLexerAround =  // Def with currying
@@ -230,7 +230,7 @@ as we can see in the definitions defined in the [`domain-logic/postfix-notation-
 
 ### A purely functional, declarative shell around imperative details
 
-Our solution till now can be seen like refactoring into an almost purely Haskell-spirited decarative paradigm. we could have written almost the same functions in Haskell with lists and the `foldr` catamorphism of the lists, the exact incarnation of array reduce:
+Our solution till now can be seen like refactoring into an almost purely Haskell-spirited decarative paradigm. We could have written almost the same functions in Haskell with lists and the `foldr` catamorphism of the lists, the exact incarnation of array reduce:
 
 **Implementation**:
 
