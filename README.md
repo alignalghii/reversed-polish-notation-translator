@@ -135,12 +135,12 @@ precedences = [('+', 1), ('-', 1), ('*', 2), ('/', 2)]
 
 processCurrentSymbol :: Char -> PostfixContext -> PostfixContext
 processCurrentSymbol currentSymbol context
-    | isDigit currentSymbol               = simpleArgument              currentSymbol context
-    | currentSymbol == '('                = stackAsPostfixOperator      currentSymbol context
-    | currentSymbol == ')'                = flushParenthesizedOperators               context
-    | otherwise                           = case currentSymbol `lookup` precedences of
-                                                Just precVal -> flushHigherPrecedenceOperators currentSymbol precVal context
-                                                Nothing      -> error $ "Invalid character " ++ [currentSymbol]
+    | isDigit currentSymbol = simpleArgument              currentSymbol context
+    | currentSymbol == '('  = stackAsPostfixOperator      currentSymbol context
+    | currentSymbol == ')'  = flushParenthesizedOperators               context
+    | otherwise             = case currentSymbol `lookup` precedences of
+                                  Just precVal -> flushHigherPrecedenceOperators currentSymbol precVal context
+                                  Nothing      -> error $ "Invalid character " ++ [currentSymbol]
 ```
 
 This fits indeed into the array reduce/fold main scheme of the task.
