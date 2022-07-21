@@ -22,11 +22,11 @@ For simplicity's sake, let the numbers be simple integers between 0 and 9 (i.e. 
 
 The sorcecode of the task can be regarded as an obfuscated version of an algorithm based on using two stacks (LIFOs). Furthermore, the obfuscated implementation seems to be having its core originally written in a declarative, functional programming style, mixed with imperative usage of closures.
 
-Thus, the task is essentially finding this pure core behind the obfuscation. This can be done by using standard refactory steps (factoring out into independent function, establishing standalone algebraic types etc.).
+Thus, the task is essentially finding this pure core behind the obfuscation. This can be done by using standard refactory steps (factoring out the characteristic functionality parts and patterns into independent functions, discovering the underlying algebraic rules, establishing one or several standalone algebraic types to represent these, etc.).
 
-This page will take a round trip. First we will show first a pure functional solution, written in Haskell. Besides undoing the obfuscation by refactory, also the imperative parts of the code will be rewritten by their purely declaritive counterparts, mostly by finding apropriate algebraic data types for the problem space. We can represent the idiomatic part of the algorithm into a “two-stack-interaction” data structure (called “`PostfixContext`” in the following sourcecode samples).
+This page will take a round trip. First we will show first a pure functional solution, written in Haskell. Besides undoing the obfuscation by refactory, also the imperative parts of the code will be rewritten into their purely declaritive counterparts, mostly by finding apropriate algebraic data types for the problem space. We can represent the idiomatic part of the algorithm into a “two-stack-interaction” data structure (called “`PostfixContext`” in the following sourcecode samples).
 
-After having shown the pure Haskell solution, we will return back to JavaScript: a Node.js implemementation will be shown. Imperative technique will be allowed here in a more relaxed, less orthodox manner, especially those that can be justified by the pecularities of the inherent features of the JavaScipt language itself (allowing in-place array modification instead of immutable structures). Thus, it will not be a direct mirror of the Haskell version, but still, we will try to keep the spirit of modularity, code reuse, lazy coupling of the pure solution.
+After having shown the pure Haskell solution, we will return back to the original JavaScript language of the task: a Node.js implemementation will be shown. Imperative techniques will be allowed here in a more relaxed, less orthodox manner, especially those that can be justified by the pecularities of the inherent features of the JavaScipt language itself (e.g. allowing in-place array modification instead of immutable structures). Thus, it will not be a direct mirror of the Haskell version, but still, we will try to keep the spirit of modularity, code reuse, lazy coupling of the pure solution.
 
 ## The Haskell version
 
@@ -155,7 +155,7 @@ processCurrentSymbol currentSymbol context
 ```
 
 This fits indeed into the array reduce/fold main scheme of the task.
-as we can see, this reducer algorithm itself consists of case analysis, and delgates its task onto smaller case delegate functions. The details can be read further below in the `PostFixContext` module file.
+as we can see, this reducer algorithm itself consists of case analysis, and delegates its task onto smaller case delegate functions. The details can be read further below in the `PostFixContext` module file.
 
 Why we have dissected even this main reducer function into stadalone cases and a separate delegate case function for each case?
 Better unit testability, and maybe also a prospect for future generalization and potential discovery interesting or deeper algebraic properties.
