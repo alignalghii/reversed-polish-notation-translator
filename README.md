@@ -254,6 +254,6 @@ This is the standard solution of implementing an [algebraic datatype](https://en
 
 ![Maybe-UML](Maybe-UML-scale50.svg "Case object implementation of the Maybe algebraic datatype")
 
-The trick's main idea was first used in Self and Smalltalkt to implement Bool, and later generalized in Scala for arbitrary algebraic datatypes: an arbitrary structure composed of algebraic direct products and direct sums (sort of records and tagged unions).
+The trick's main idea was first used in Self and Smalltalk to implement Bool, and later generalized in Scala for arbitrary algebraic datatypes: an arbitrary structure composed of algebraic direct products and direct sums (sort of records and tagged unions).
 
 ![Bool-UML](Bool-UML-scale50.svg "Case object implementation of the Bool type in Smalltalk and Self")
