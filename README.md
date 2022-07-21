@@ -26,7 +26,7 @@ Thus, the task is essentially finding this pure core behind the obfuscation. Thi
 
 This page will take a round trip. First we will show first a pure functional solution, written in Haskell. Besides undoing the obfuscation by refactory, also the imperative parts of the code will be rewritten into their purely declaritive counterparts, mostly by finding apropriate algebraic data types for the problem space. We can represent the idiomatic part of the algorithm into a “two-stack-interaction” data structure (called “`PostfixContext`” in the following sourcecode samples).
 
-After having shown the pure Haskell solution, we will return back to the original JavaScript language of the task: a Node.js implemementation will be shown. Imperative techniques will be allowed here in a more relaxed, less orthodox manner, especially those that can be justified by the pecularities of the inherent features of the JavaScipt language itself (e.g. allowing in-place array modification instead of immutable structures). Thus, it will not be a direct mirror of the Haskell version, but still, we will try to keep the spirit of modularity, code reuse, lazy coupling of the pure solution.
+After having shown the pure Haskell solution, we will return back to the original JavaScript language of the task: a Node.js implementation will be shown. Imperative techniques will be allowed here in a more relaxed, less orthodox manner, especially those that can be justified by the pecularities of the inherent features of the JavaScipt language itself (e.g. allowing in-place array modification instead of immutable structures). Thus, it will not be a direct mirror of the Haskell version, but still, we will try to keep the spirit of modularity, code reuse, lazy coupling of the pure solution.
 
 ## The Haskell version
 
@@ -56,7 +56,7 @@ translateSpec = describe "The main function of the task: translate" $ do
         translate "1*(2+3)" `shouldBe` "123+*
 ```
 
-Although intuitively this seems to be a sufficient coverage for the specification of the problem, the so-called *property testing* often provides more thorough testing, because random generation provides hundreds of samples for free. Of course, that comes for a price, but this is infact rather an advantage rather than a disadvantage: property testing motivates the programmer towards grasping core properties on a higher level, and a good unserstanding of the very algebra of the problem.
+Although intuitively this seems to be a sufficient coverage for the specification of the problem, the so-called *property testing* often provides more thorough testing, because random generation provides hundreds of samples for free. Of course, that comes for a price, — its harder to find out the rules that are worth testing, — but this is in fact rather an advantage rather than a disadvantage: property testing motivates the programmer towards grasping core properties on a higher level, and a good understanding of the very algebra of the problem.
 
 Here, QuickCheck will be used for this property testing tool, but the more important question is how we can grasp the task and generalize in into algebraic properties. It can be done indeed: let us discover a kind of $\vec V$-shape pattern:
 
@@ -94,14 +94,16 @@ Turning it into the familiary infix form is harder due to additional notational 
 
 To put the pieces together:
 
- - simply generate random syntax trees of arithmetic expession, a lot by hundreds (“the bottom point of the $\vec V$”),
- - and turn it into representations, both in infix and in postfix form (“the two legs/wings/branches of the $\vec V$”).
- - Use the infix form as an input of the `translate` function (“the over-arrow symbol above the $\vec V$”)
+ - simply generate random syntax trees of arithmetic expession, a lot of random samples, several hundreds (“the bottom point of the $\vec V$”),
+ - and turn it into representations, both into infix and into postfix forms (“the two legs/wings/branches of the $\vec V$”).
+ - Use the infix form as an input for the `translate` function (“the over-arrow symbol above the $\vec V$”)
  - and check whether the result is the same as the postix form.
+
+ See the schema on figure below:
 
 ![V-testing](_images/V-testing-scale50.svg "V-shape pattern for property testing")
 
-QuickCheck is thus a very strong tool for testig, by making the random generation of instances of any custom datatype easily automatizable:
+QuickCheck tests made according to this schema passes with OK report, demonstrates algorithm correctness convincingly, has a good coverage, grasps the algebraic essence. QuickCheck is a very strong tool for testig, by making the random generation of instances of any custom datatype easily automatizable:
 
 ```haskell
 import Test.QuickCheck
@@ -134,7 +136,7 @@ translate :: String -> String
 translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
 ```
 
-Thus, we have kept the main scheme of the original code obfuscation: the “*array-fold/reduce*” construct. But we have cleaned it up: we “factored out” the imperative closures than hang around this main core like rags, and integrated this imperative parts into the traversed structure itself: we augmented the traversed array into a contexted algebraic structure consisting of two stacks.
+Thus, we have kept the main scheme of the original code obfuscation: the “*array-fold/reduce*” construct. But we have cleaned it up: we “factored out” the imperative closures that accompanied the array reduction loop with secondary effects. We have eliminated this imperative constructs: we made the secondary effects explicit by integrating them into the traversed structure itself: we augmented the traversed array into a contexted algebraic structure consisting of two stacks.
 
 This is exactly what the [`PostfixContext.hs`](haskell+quickcheck/PostfixContext.hs) file is about:
 
@@ -155,9 +157,9 @@ processCurrentSymbol currentSymbol context
 ```
 
 This fits indeed into the array reduce/fold main scheme of the task.
-as we can see, this reducer algorithm itself consists of case analysis, and delegates its task onto smaller case delegate functions. The details can be read further below in the `PostFixContext` module file.
+As we can see, this reducer algorithm itself consists of case analysis, and delegates its task onto smaller case delegate functions. The details can be read further below in the `PostFixContext` module file. There a two stacks, and we transpfer items from one stack onto the other one governed by the current symbol under procession, in a pure fold/reduce manner.
 
-Why we have dissected even this main reducer function into stadalone cases and a separate delegate case function for each case?
+Why have we dissected even this main reducer function into stadalone cases and established a standalone separate delegate case function for each case?
 Better unit testability, and maybe also a prospect for future generalization and potential discovery interesting or deeper algebraic properties.
 
 ---
