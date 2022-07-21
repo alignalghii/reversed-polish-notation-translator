@@ -157,10 +157,9 @@ processCurrentSymbol currentSymbol context
 ```
 
 This fits indeed into the array reduce/fold main scheme of the task.
-As we can see, this reducer algorithm itself consists of case analysis, and delegates its task onto smaller case delegate functions. The details can be read further below in the `PostFixContext` module file. There a two stacks, and we transpfer items from one stack onto the other one governed by the current symbol under procession, in a pure fold/reduce manner.
+As we can see, this reducer algorithm itself consists of case analysis, and delegates its task onto smaller case delegate functions. The details can be read further below in the `PostFixContext` module file. The `PostFixContext` datatype is a pair of two *stacks*, and the most importatnt operation on it is to transfer items from one stack onto the other one, governed by the current symbol under procession, in a pure fold/reduce manner.
 
-Why have we dissected even this main reducer function into stadalone cases and established a standalone separate delegate case function for each case?
-Better unit testability, and maybe also a prospect for future generalization and potential discovery interesting or deeper algebraic properties.
+We dissected even this “purified” main reducer/fold function into stadalone cases and established a standalone separate delegate case function for each case, in order to enable unit testability for each case, and maybe also explore better possible underlying algebraic properties.
 
 ---
 [[To the top of this README]](#readme) •|||• [[To project source]](#top)
