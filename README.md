@@ -1,3 +1,8 @@
+---
+[[To project source]](#top)
+
+---
+
 # Using patterns from functional programming for refactoring traditional codebases
 
 ## Table of contents
@@ -144,6 +149,11 @@ as we can see, this reducer algorithm itself consists of case analysis, and delg
 Why we have dissected even this main reducer function into stadalone cases and a separate delegate case function for each case?
 Better unit testability, and maybe also a prospect for future generalization and potential discovery interesting or deeper algebraic properties.
 
+---
+[[To the top of this README]](#readme) •|||• [[To project source]](#top)
+
+---
+
 ## The Node.js version
 
 The same idea can be expressed also in the JavaScript (nodejs) version, although we will keep some parts imperative, due to the different optimization strategies of the two compilers/interpreters.
@@ -200,6 +210,11 @@ const rawTextToPostfixNotation = wrapLexerAround(expressionToPostfixNotation); /
 ```
 
 as we can see in the definitions defined in the [`domain-logic/postfix-notation-translator.mjs`](nodejs/domain-logic/postfix-notation-translator.mjs) file.
+
+---
+[[To the top of this README]](#readme) •|||• [[To project source]](#top)
+
+---
 
 ## A purely functional, declarative shell around imperative details
 
@@ -266,3 +281,8 @@ This is the standard solution of implementing an [algebraic datatype](https://en
 The trick's main idea was first used in Self and Smalltalk to implement Bool, and later generalized in Scala for arbitrary algebraic datatypes: an arbitrary structure composed of algebraic direct products and direct sums (sort of records and tagged unions).
 
 ![Bool-UML](Bool-UML-scale50.svg "Case object implementation of the Bool type in Smalltalk and Self")
+
+---
+[[To the top of this README]](#readme) •|||• [[To project source]](#top)
+
+---
