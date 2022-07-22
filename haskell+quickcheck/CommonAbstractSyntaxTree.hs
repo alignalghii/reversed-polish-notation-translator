@@ -27,7 +27,12 @@ instance Arbitrary SimpleArithmetic where
 
 genSizedArithmetic :: Int -> Gen SimpleArithmetic
 genSizedArithmetic 0 = Simple <$> arbitrary
-genSizedArithmetic n = oneof [genSizedArithmetic 0, Add <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Substract <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Multiply <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Divide <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n]
+genSizedArithmetic n = oneof [ genSizedArithmetic 0,
+                               Add <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n,
+                               Substract <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n,
+                               Multiply <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n,
+                               Divide <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n
+                             ]
 genSubsizedArithmetic = genSizedArithmetic . (`div` 2)
 
 

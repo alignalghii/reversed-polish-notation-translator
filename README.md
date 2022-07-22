@@ -103,7 +103,7 @@ To put the pieces together:
 
 ![V-testing](_images/V-testing-scale50.svg "V-shape pattern for property testing")
 
-QuickCheck tests made according to this schema passes with OK report, demonstrates algorithm correctness convincingly, has a good coverage, grasps the algebraic essence. QuickCheck is a very strong tool for testig, by making the random generation of instances of any custom datatype easily automatizable:
+QuickCheck tests made according to this schema pass well with success report, thus they demonstrate the algorithm correctness convincingly, have a good coverage, grasp the algebraic essence. QuickCheck is a very strong tool for testing, by making the random generation of instances of any custom datatype easily automatizable:
 
 ```haskell
 import Test.QuickCheck
@@ -116,7 +116,12 @@ instance Arbitrary SimpleArithmetic where
 
 genSizedArithmetic :: Int -> Gen SimpleArithmetic
 genSizedArithmetic 0 = Simple <$> arbitrary
-genSizedArithmetic n = oneof [genSizedArithmetic 0, Add <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Substract <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Multiply <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n, Divide <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n]
+genSizedArithmetic n = oneof [ genSizedArithmetic 0,
+                               Add <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n,
+                               Substract <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n,
+                               Multiply <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n,
+                               Divide <$> genSubsizedArithmetic n <*> genSubsizedArithmetic n
+                             ]
 genSubsizedArithmetic = genSizedArithmetic . (`div` 2)
 ```
 
@@ -136,7 +141,7 @@ translate :: String -> String
 translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
 ```
 
-Thus, we have kept the main scheme of the original code obfuscation: the “*array-fold/reduce*” construct. But we have cleaned it up: we “factored out” the imperative closures that accompanied the array reduction loop with secondary effects. We have eliminated this imperative constructs: we made the secondary effects explicit by integrating them into the traversed structure itself: we augmented the traversed array into a contexted algebraic structure consisting of two stacks.
+Thus, we have kept the main scheme of the original code obfuscation: the “*array-fold/reduce*” construct. But we have cleaned it up: we “factored out” the imperative closures that accompanied the array reduction loop with secondary effects. We have eliminated these imperative constructs: we made the secondary effects explicit by integrating them into the traversed structure itself: we augmented the traversed array into a contexted algebraic structure consisting of two stacks.
 
 This is exactly what the [`PostfixContext.hs`](haskell+quickcheck/PostfixContext.hs) file is about:
 
