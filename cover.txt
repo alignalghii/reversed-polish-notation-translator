@@ -1,0 +1,81 @@
+Andere Details, zusammen mit der Refaktorisierung der Aufgabe in JavaScript-Quellcode zeige ich hier:
+
+https://github.com/alignalghii/reversed-polish-notation-translator
+
+Freilich habe ich diese Seite nur mit Ihnen mitgeteilt, nur für diesen Zweck, und ich habe sie anonimisiert wie ich nur konnte, und freilich werde ich sie auf Ihren Wunsch auslösen.
+
+Vielen Dank für die interessante Aufgabe.
+
+Einige Abrisse, Zitate von der engültigen JavaScript-Lösung:
+
+--------------------
+const expressionToPostfixNotation = inputExpression =>
+        inputExpression.reduce(
+            (context, currentSymbol) => {context.processCurrentSymbol(currentSymbol); return context;},
+            new PostfixContext([], [])
+        ).bendBack();
+
+function PostfixContext(argumentsExpression, postfixStack)
+{
+    this.argumentsExpression = argumentsExpression;
+    this.postfixStack        = postfixStack;
+}
+
+PostfixContext.arithmeticPrecedences = {'+': 1, '-': 1, '*': 2, '/': 2};
+
+// The main, central instance method:
+
+PostfixContext.prototype.processCurrentSymbol = function (currentSymbol)
+{
+    const precs = PostfixContext.arithmeticPrecedences;
+    switch (true) {
+        case /[0-9]/.test(currentSymbol): this.simpleArgument                 (currentSymbol                      ); break;
+        case currentSymbol in precs     : this.flushHigherPrecendenceOperators(currentSymbol, precs[currentSymbol]); break;
+        case currentSymbol == '('       : this.stackAsPostfixOperator         (currentSymbol                      ); break;
+        case currentSymbol == ')'       : this.flushParenthesizedOperators    (                                   ); break;
+    }
+};
+
+PostfixContext.prototype.bendBack = function ()
+{
+    return this.argumentsExpression.concat(this.postfixStack.reverse());
+};
+
+PostfixContext.prototype.moveItemsWhile = function (condition)
+{
+    this.postfixStack.moveItemsToWhile(
+        this.argumentsExpression,
+        condition
+    );
+};
+
+// .. and its constituent delegate methods:
+
+PostfixContext.prototype.simpleArgument = function (currentSymbol)
+{
+    this.argumentsExpression.push(currentSymbol);
+};
+
+
+PostfixContext.prototype.stackAsPostfixOperator = function (currentSymbol)
+{
+    this.postfixStack.push(currentSymbol);
+};
+
+
+PostfixContext.prototype.flushHigherPrecendenceOperators = function (currentSymbol, currentSymbolPrecedence)
+{
+    const precs = PostfixContext.arithmeticPrecedences;
+    this.moveItemsWhile(
+        stackItem => stackItem in precs && precs[stackItem] >= currentSymbolPrecedence
+    );
+    this.stackAsPostfixOperator(currentSymbol);
+};
+
+PostfixContext.prototype.flushParenthesizedOperators = function ()
+{
+            this.moveItemsWhile(
+                stackItem => stackItem != '('
+            );
+            this.postfixStack.pop();
+};

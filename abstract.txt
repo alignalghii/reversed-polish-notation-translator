@@ -1,0 +1,137 @@
+Vielen Dank für die interessante Aufgabe.
+
+Das ist ein Übersetzer von der gewöhnlichen infix-Notation in die umgekehrte polnische Notation (postfix-Notation) von einfachen arithmetischen Ausdrücken.
+Der Quellcode is eine Verschleierung (Obfuskation) einer reiner funktionalen Haskell-Programm, zu JavaScript-(warscheinlich Nodejs)-Ausdrücken transkribiert, und mit imperativen Closure-Nebeneffekten verschleiert.
+
+Die reine, lesbare Lösung kann mit standardmäßigen Refaktorisierungsschritten wiederentdeckt werden.
+Das werde ich hier in Haskell-Programmiersprache zeigen.
+Andere Details, zusammen mit der Refaktorisierung in JavaScript-Quellcode zeige ich hier:
+
+https://github.com/alignalghii/reversed-polish-notation-translator
+
+Jetzt werde ich erstens die Haskell-Lösung zeigen.
+Die Architektur des Algorithmus kann in Schichten erklärt werden:
+
+------------------------------------
+module Translator where
+
+import PostfixContext hiding (spec)
+-- For testing:
+import CommonAbstractSyntaxTree
+import Test.Hspec
+import Test.QuickCheck
+
+translate :: String -> String
+translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
+
+translateSpec :: Spec
+translateSpec = describe "The main function of the task: translate" $ do
+    it "keeps a digit symbol like simpleArgument" $ do
+        translate ""        `shouldBe` ""
+        translate "1"       `shouldBe` "1"
+        translate "12"      `shouldBe` "12"
+        translate "123"     `shouldBe` "123"
+    it "processes a simple infix construct like postfix" $ do
+        translate "1+2"     `shouldBe` "12+"
+        translate "2*3"     `shouldBe` "23*"
+    it "handles precedences and parantheses well" $ do
+        translate "2*3+1"   `shouldBe` "23*1+"
+        translate "1+2*3"   `shouldBe` "123*+"
+        translate "1*(2+3)" `shouldBe` "123+*"
+
+prop_translate :: SimpleArithmetic -> Bool
+prop_translate abstractSyntaxTree = translate (showAsInfix abstractSyntaxTree) == showAsPostfix abstractSyntaxTree
+--------------------------------
+
+Test-Frameworks (Hspec, QuickCheck) können eine gute Spezifikation/Anforderung sichern.
+Was den Algorithmus, die Implementation betrifft, die höchste Schicht ist:
+
+--------------------------------
+translate :: String -> String
+translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
+--------------------------------
+
+Das ist Traversierung der Eingabe-Zeichenkette auf der fold/reduce-Weise: der berühmte fold-Katamorphismus der algebraischen Datentyp Liste.
+Dieser Katamorphismus öffnet eine beliebige Verarbeitungsmöglichkeit von der Liste-Datentyp, inzwischen delegiert die Aufgabe weiter auf eine Zustandsumwandlungsfunktion:
+
+------------------------------------
+processCurrentSymbol :: Char -> PostfixContext -> PostfixContext
+processCurrentSymbol currentSymbol context
+    | isDigit currentSymbol = simpleArgument              currentSymbol context
+    | currentSymbol == '('  = stackAsPostfixOperator      currentSymbol context
+    | currentSymbol == ')'  = flushParenthesizedOperators               context
+    | otherwise             = case currentSymbol `lookup` precedences of
+                                  Just precVal -> flushHigherPrecedenceOperators currentSymbol precVal context
+                                  Nothing      -> error $ "Invalid character " ++ [currentSymbol]
+------------------------------------
+
+Hier is die Typsignatur am wichtigsten:
+
+--------------------------------
+processCurrentSymbol :: Char -> PostfixContext -> PostfixContext
+--------------------------------
+
+PostfixContext is ein algebraischer  Datentyp, der die idiomatische, eigenständige Züge der Aufgabe und des Algorithmus representieren kann. Wir müssen ihn treulich und mit Aufmerksamkeit planen. Eine Hilfe: der urtümliche, verschleierte Obfuskations-Quellcode arbeitet mit zwei Stapeln. So können with einen guten PostfixContext-Datentyp planen, wenn wir ihn einfach als ein Paar von zwei Stapel/LIFO-Datenstrukturen definieren:
+
+type PostfixContext = (String, String)
+
+Der wichtigste Operator auf dem PostfixContext-Datentyp ist die bedingte Transportierung/Überführung der Zeichen von einer der Stapleln auf den anderen Stapel:
+
+--------------------------------
+moveItemsWhile :: (Char -> Bool) -> PostfixContext -> PostfixContext
+moveItemsWhile _    ct@(argumentsExpression, []                ) = ct
+moveItemsWhile prop ct@(argumentsExpression, op : postfixStack')
+    | prop op   = moveItemsWhile prop (op : argumentsExpression, postfixStack')
+    | otherwise = ct
+--------------------------------
+
+Mit dierer Hauptoperator können wir alle vier Zeichenverarbeitung-Fälle audrücken:
+
+--------------------------------
+simpleArgument, stackAsPostfixOperator :: Char -> PostfixContext -> PostfixContext
+simpleArgument                  = first  . (:)
+stackAsPostfixOperator          = second . (:)
+
+flushParenthesizedOperators :: PostfixContext -> PostfixContext
+flushParenthesizedOperators =  second tail . moveItemsWhile (/= '(')
+
+flushHigherPrecedenceOperators :: Char -> Int -> PostfixContext -> PostfixContext
+flushHigherPrecedenceOperators currentSymbol currSmbPrec = stackAsPostfixOperator currentSymbol . moveItemsWhile (isOfHigherPrecedenceThan currSmbPrec)
+--------------------------------
+
+Wir sind fertig. Die Hauptfunktion der Aufgabe kann schon die Eingabe-Zeichenkette (eine Infixnotation) verarbeiten, und inzwischen wird ein initialer PostfixContexts-Zustand in einen finalen ostfixContexts-Zustand transformiert. Wir bekommen das allerletzte, endgültige Ergebnis, wenn wir den finalen PostfixContexts-Zustand ,,zurückfalten'':
+
+--------------------------------
+initialPostfixContext :: PostfixContext
+initialPostfixContext = ("", "")
+
+bendBack :: PostfixContext -> String
+bendBack (argumentsExpression, postfixStack) = reverse argumentsExpression ++ postfixStack
+--------------------------------
+
+`bendBack`wird uns das erwartete Ergebnis: die postfix-Notation (umgekehrte polnische Notation) geben.
+
+Nachdem wir die Details erklärt haben, werfen wir noch wieder einen zusammenfassenden Blick auf die Haupt/Eintrittsfunktionen und anderen wichtigsten Funktionen der Lösung:
+
+--------------------------------
+translate :: String -> String
+translate = bendBack . foldl (flip processCurrentSymbol) initialPostfixContext
+
+processCurrentSymbol :: Char -> PostfixContext -> PostfixContext
+processCurrentSymbol currentSymbol context
+    | isDigit currentSymbol = simpleArgument              currentSymbol context
+    | currentSymbol == '('  = stackAsPostfixOperator      currentSymbol context
+    | currentSymbol == ')'  = flushParenthesizedOperators               context
+    | otherwise             = case currentSymbol `lookup` precedences of
+                                  Just precVal -> flushHigherPrecedenceOperators currentSymbol precVal context
+                                  Nothing      -> error $ "Invalid character " ++ [currentSymbol]
+
+precedences :: [(Char, Int)]
+precedences = [('+', 1), ('-', 1), ('*', 2), ('/', 2)]
+
+moveItemsWhile :: (Char -> Bool) -> PostfixContext -> PostfixContext
+moveItemsWhile _    ct@(argumentsExpression, []                ) = ct
+moveItemsWhile prop ct@(argumentsExpression, op : postfixStack')
+    | prop op   = moveItemsWhile prop (op : argumentsExpression, postfixStack')
+    | otherwise = ct
+--------------------------------
