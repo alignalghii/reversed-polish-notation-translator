@@ -1,5 +1,5 @@
 ---
-[[To project source]](#top)
+[[To project source]](#top) •|||• [[Other project examples for declarative paradigms]](https://alignalghii.github.io)
 
 ---
 
@@ -126,7 +126,7 @@ genSubsizedArithmetic = genSizedArithmetic . (`div` 2)
 ```
 
 ---
-[[To the top of this README]](#readme) •|||• [[To project source]](#top)
+[[To the top of this README]](#readme) •|||• [[To project source]](#top) •|||• [[Other project examples for declarative paradigms]](https://alignalghii.github.io)
 
 ---
 
@@ -167,7 +167,7 @@ As we can see, this reducer algorithm itself consists of case analysis, and dele
 We dissected even this “purified” main reducer/fold function into stadalone cases and established a standalone separate delegate case function for each case, in order to enable unit testability for each case, and maybe also explore better possible underlying algebraic properties.
 
 ---
-[[To the top of this README]](#readme) •|||• [[To project source]](#top)
+[[To the top of this README]](#readme) •|||• [[To project source]](#top) •|||• [[Other project examples for declarative paradigms]](https://alignalghii.github.io)
 
 ---
 
@@ -229,7 +229,7 @@ const rawTextToPostfixNotation = wrapLexerAround(expressionToPostfixNotation); /
 as we can see in the definitions defined in the [`domain-logic/postfix-notation-translator.mjs`](nodejs/domain-logic/postfix-notation-translator.mjs) file.
 
 ---
-[[To the top of this README]](#readme) •|||• [[To project source]](#top)
+[[To the top of this README]](#readme) •|||• [[To project source]](#top) •|||• [[Other project examples for declarative paradigms]](https://alignalghii.github.io)
 
 ---
 
@@ -300,6 +300,6 @@ The trick's main idea was first used in Self and Smalltalk to implement Bool, an
 ![Bool-UML](_images/Bool-UML-scale50.svg "Case object implementation of the Bool type in Smalltalk and Self")
 
 ---
-[[To the top of this README]](#readme) •|||• [[To project source]](#top)
+[[To the top of this README]](#readme) •|||• [[To project source]](#top) •|||• [[Other project examples for declarative paradigms]](https://alignalghii.github.io)
 
 ---
